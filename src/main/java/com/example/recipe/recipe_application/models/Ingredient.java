@@ -16,6 +16,8 @@ public class Ingredient {
 
     private String name;
 
+    private String amount;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="recipe_id")

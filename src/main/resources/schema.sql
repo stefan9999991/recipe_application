@@ -10,6 +10,7 @@ create table if not exists recipes (
 create table if not exists ingredients (
     id serial not null,
     name varchar,
+    amount varchar,
     recipe_id integer not null,
     primary key (id),
     constraint fk_recipe foreign key (recipe_id)
