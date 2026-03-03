@@ -1,11 +1,9 @@
 package com.example.recipe.recipe_application.controllers;
 
 import com.example.recipe.recipe_application.models.Recipe;
-import com.example.recipe.recipe_application.repositories.RecipeRepository;
 import com.example.recipe.recipe_application.services.RecipeService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class RecipeController {
     }
 
     @PostMapping("/recipe")
-    public Recipe createRecipe(@RequestBody Recipe recipe) {
+    public Recipe createRecipe(@Valid @RequestBody Recipe recipe) {
         return recipeService.createRecipe(recipe);
     }
 

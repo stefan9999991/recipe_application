@@ -1,6 +1,9 @@
 package com.example.recipe.recipe_application.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Set;
@@ -13,18 +16,24 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
     private String name;
 
+    @NotBlank
     private String description;
 
+    @Valid
+    @NotNull
     @OneToMany(mappedBy = "recipe",
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private Set<Ingredient> ingredients;
 
     // Time required to cook in minutes
+    @NotNull
     private Integer time;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private MealType mealType;
 
