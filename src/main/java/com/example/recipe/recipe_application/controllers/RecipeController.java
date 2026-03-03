@@ -2,6 +2,7 @@ package com.example.recipe.recipe_application.controllers;
 
 import com.example.recipe.recipe_application.models.Recipe;
 import com.example.recipe.recipe_application.repositories.RecipeRepository;
+import com.example.recipe.recipe_application.services.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -10,38 +11,29 @@ import java.util.List;
 
 @RestController
 public class RecipeController {
-    private final RecipeRepository recipeRepository;
+    private final RecipeService recipeService;
 
-    public RecipeController(RecipeRepository recipeRepository) {
-        this.recipeRepository = recipeRepository;
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
     }
 
     @GetMapping("/recipe/{id}")
     public Recipe getRecipe(@PathVariable Integer id) {
-        Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return recipe;
+        return recipeService.getRecipe(id);
     }
 
     @GetMapping("/recipes")
     public List<Recipe> getAllRecipes(@RequestParam(defaultValue = "") String search) {
-        return recipeRepository.findByNameContaining(search);
+        return recipeService.getAllRecipes(search);
     }
 
     @PostMapping("/recipe")
     public Recipe createRecipe(@RequestBody Recipe recipe) {
-        if (recipe.getId() != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "recipe Id not allowed");
-        }
-        recipe.getIngredients().forEach(ingredient -> ingredient.setId(null));
-        recipe.getIngredients().forEach(recipe::addIngredient);
-        return recipeRepository.save(recipe);
+        return recipeService.createRecipe(recipe);
     }
 
     @DeleteMapping("/recipe/{id}")
     public void deleteRecipe(@PathVariable Integer id) {
-        Recipe recipe = recipeRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
-        recipeRepository.delete(recipe);
+        recipeService.deleteRecipe(id);
     }
 }
