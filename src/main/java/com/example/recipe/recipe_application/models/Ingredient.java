@@ -3,9 +3,7 @@ package com.example.recipe.recipe_application.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -30,7 +28,8 @@ public class Ingredient {
 
     public Ingredient() {}
 
-    public Ingredient(String name) {
+    public Ingredient(String name, String amount) {
         this.name = name;
+        this.amount = amount;
     }
 }

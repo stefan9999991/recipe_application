@@ -3,6 +3,7 @@ package com.example.recipe.recipe_application.models;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 
 @Getter
 @Entity
+@Setter
 @Table(name="recipes")
 public class Recipe {
     @Id
@@ -23,7 +25,7 @@ public class Recipe {
     private String description;
 
     @Valid
-    @NotNull
+    @NotEmpty
     @OneToMany(mappedBy = "recipe",
                cascade = CascadeType.ALL,
                orphanRemoval = true)
