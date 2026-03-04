@@ -6,6 +6,7 @@ import com.example.recipe.recipe_application.models.Recipe;
 import com.example.recipe.recipe_application.repositories.RecipeRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +26,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RecipeControllerTest {
+public class OtherRecipeControllerTest {
     public Recipe recipe1;
 
     public Recipe recipe2;
+
+    public String recipe1String;
+    public String recipe2String;
 
     @LocalServerPort
     private Integer port;
@@ -69,12 +73,49 @@ public class RecipeControllerTest {
         recipe2 = new Recipe("Pizza Tuna", "I love pizza", new HashSet<>(), 45, MealType.DINNER);
         recipe2.addIngredient(new Ingredient("Cheese", "2L"));
         recipe2.addIngredient(new Ingredient("Olives", "2 OZ"));
+
+        recipe1String = """
+                {
+                  "name": "Pizza",
+                  "description": "I love pizza",
+                  "time": 45,
+                  "mealType": "DINNER",
+                  "ingredients": [
+                    { "name": "Tomato", "amount": "1kg" },
+                    { "name": "Dough", "amount": "3kg" }
+                  ]
+                }""";
+
+        recipe2String = """
+                {
+                  "name": "Pizza Tuna",
+                  "description": "I love pizza",
+                  "time": 45,
+                  "mealType": "DINNER",
+                  "ingredients": [
+                    { "name": "Cheese", "amount": "2L" },
+                    { "name": "Olives", "amount": "2 OZ" }
+                  ]
+                }""";
+    }
+
+    private JsonPath saveRecipe(String jsonRecipe) {
+        return given()
+                .contentType(ContentType.JSON)
+                .body(jsonRecipe)
+                .when()
+                .post("/recipe")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .jsonPath();
     }
 
     @Test
     void shouldGetAllRecipes() {
-        recipeRepository.save(recipe1);
-        recipeRepository.save(recipe2);
+        saveRecipe(recipe1String);
+        saveRecipe(recipe2String);
 
         given()
                 .contentType(ContentType.JSON)
@@ -87,9 +128,8 @@ public class RecipeControllerTest {
 
     @Test
     void shouldGetRecipe1() {
-        Recipe savedRecipe = recipeRepository.save(recipe1);
-        Integer recipe1Id = savedRecipe.getId();
-        recipeRepository.save(recipe2);
+        Integer recipe1Id = saveRecipe(recipe1String).get("id");
+        saveRecipe(recipe2String);
 
         given()
                 .contentType(ContentType.JSON)
@@ -98,16 +138,16 @@ public class RecipeControllerTest {
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(recipe1Id))
-                .body("name", equalTo(savedRecipe.getName()))
-                .body("description", equalTo(savedRecipe.getDescription()))
-                .body("time", equalTo(savedRecipe.getTime()))
-                .body("mealType", equalTo(savedRecipe.getMealType().toString()));
+                .body("name", equalTo(recipe1.getName()))
+                .body("description", equalTo(recipe1.getDescription()))
+                .body("time", equalTo(recipe1.getTime()))
+                .body("mealType", equalTo(recipe1.getMealType().toString()));
     }
 
     @Test
     void shouldGetRecipe2BySearch() {
-        recipeRepository.save(recipe1);
-        recipeRepository.save(recipe2);
+        saveRecipe(recipe1String);
+        saveRecipe(recipe2String);
 
         given()
                 .contentType(ContentType.JSON)
@@ -120,19 +160,6 @@ public class RecipeControllerTest {
 
     @Test
     void shouldCreateRecipe() {
-        String recipe1String = """
-                {
-                  "name": "Pizza",
-                  "description": "I love pizza",
-                  "time": 45,
-                  "mealType": "DINNER",
-                  "ingredients": [
-                    { "name": "Dough", "amount": "1kg" },
-                    { "name": "Tomato", "amount": "1L" },
-                    { "name": "Cheese", "amount": "3 Pounds" }
-                  ]
-                }""";
-
         given()
                 .contentType(ContentType.JSON)
                 .body(recipe1String)
@@ -172,8 +199,8 @@ public class RecipeControllerTest {
 
     @Test
     void shouldDeleteRecipe1() {
-        Integer recipe1Id = recipeRepository.save(recipe1).getId();
-        recipeRepository.save(recipe2);
+        Integer recipe1Id = saveRecipe(recipe1String).get("id");
+        Integer recipe2Id = saveRecipe(recipe2String).get("id");
 
         given()
                 .contentType(ContentType.JSON)
