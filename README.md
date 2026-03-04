@@ -126,3 +126,12 @@ Docker must be running.
 - OpenAPI documentation is generated automatically.
 
 - The project uses real PostgreSQL in tests for realistic behavior.
+
+## Future implementations (more time)
+
+- Make separate ingredients api
+- Implement Update recipe call
+- Create a search including description (should be a separate call, otherwise there might be a lot of false positives since description could include baking instructions or history that accidentally triggers that search term)
+- Better error messages
+- Better error testing: e.g. that with unexpected queries something doesn't break.
+- Splitting up recipe into a recipeResponse and recipeRequest to avoid things like id being available in the recipe input to the endpoint.
